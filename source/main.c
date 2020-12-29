@@ -6,7 +6,7 @@ int nthread_run;
 char notify_buf[512];
 configuration config;
 
-void* nthread_func(void* arg) {
+void *nthread_func(void *arg) {
   UNUSED(arg);
   time_t t1, t2;
   t1 = 0;
@@ -26,10 +26,10 @@ void* nthread_func(void* arg) {
   return NULL;
 }
 
-static int config_handler(void* user, const char* name, const char* value) {
-  configuration* pconfig = (configuration*)user;
+static int config_handler(void *user, const char *name, const char *value) {
+  configuration *pconfig = (configuration *)user;
 
-  #define MATCH(n) strcmp(name, n) == 0
+#define MATCH(n) strcmp(name, n) == 0
 
   if (MATCH("split")) {
     pconfig->split = atoi(value);
@@ -42,7 +42,7 @@ static int config_handler(void* user, const char* name, const char* value) {
   return 1;
 }
 
-void dump_game(char* title_id, char* usb_path) {
+void dump_game(char *title_id, char *usb_path) {
   char base_path[64];
   char src_path[64];
   char dst_file[64];
@@ -140,7 +140,7 @@ void dump_game(char* title_id, char* usb_path) {
   touch_file(comp_sem);
 }
 
-int _main(struct thread* td) {
+int _main(struct thread *td) {
   UNUSED(td);
 
   char title_id[64];

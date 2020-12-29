@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-#define SPLIT_APP   1
+#define SPLIT_APP 1
 #define SPLIT_PATCH 2
 
 typedef struct {
