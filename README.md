@@ -1,5 +1,4 @@
 App Dumper
-Kernel Dumper
 ===
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c4a4074a6723455b8d504bf0efdbda16)](https://www.codacy.com/gh/Scene-Collective/ps4-app-dumper/dashboard)
 
