@@ -8,7 +8,7 @@
     "default": "Dumps and decrypts applications to a USB device. Can be configured with `dumper.cfg` on the root of the USB device.",
     "en": "Dumps and decrypts applications to a USB device. Can be configured with `dumper.cfg` on the root of the USB device."
   },
-  "author": "XVortex",
+  "author": "xvortex",
   "url": "https://github.com/Scene-Collective/ps4-app-dumper",
   "redirect": false,
   "reload": false,
