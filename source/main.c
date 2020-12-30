@@ -147,7 +147,6 @@ int _main(struct thread *td) {
   char usb_name[64];
   char usb_path[64];
   char cfg_path[64];
-  int progress;
 
   initKernel();
   initLibc();
@@ -189,6 +188,7 @@ int _main(struct thread *td) {
   }
 
   if (wait_for_bdcopy(title_id) < 100) {
+    int progress;
     do {
       sceKernelSleep(1);
       progress = wait_for_bdcopy(title_id);
