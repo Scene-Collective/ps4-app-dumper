@@ -15,7 +15,7 @@ void *nthread_func(void *arg) {
       t2 = time(NULL);
       if ((t2 - t1) >= config.notify) {
         t1 = t2;
-        printf_notification(notify_buf);
+        systemMessage(notify_buf);
       }
     } else {
       t1 = 0;
@@ -170,7 +170,7 @@ int _main(struct thread *td) {
   sceKernelSleep(5);
 
   if (!wait_for_usb(usb_name, usb_path)) {
-    sprintf(notify_buf, "Waiting for USB disk...");
+    sprintf(notify_buf, "Waiting for USB device...");
     do {
       sceKernelSleep(1);
     } while (!wait_for_usb(usb_name, usb_path));
@@ -205,7 +205,7 @@ int _main(struct thread *td) {
   if (config.shutdown) {
     printf_notification("%s dumped.\nShutting down...", title_id);
   } else {
-    printf_notification("%s dumped.\nBye!", title_id);
+    printf_notification("%s dumped.\nQuitting...", title_id);
   }
   sceKernelSleep(10);
 
