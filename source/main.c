@@ -165,7 +165,7 @@ int _main(struct thread *td) {
   ScePthread nthread;
   scePthreadCreate(&nthread, NULL, nthread_func, NULL, "nthread");
 
-  printf_notification("Running PS4 App Dumper");
+  printf_notification("Running App Dumper");
   sceKernelSleep(5);
 
   if (!wait_for_usb(usb_name, usb_path)) {
