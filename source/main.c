@@ -207,11 +207,11 @@ int _main(struct thread *td) {
   } else {
     printf_notification("%s dumped.\nQuitting...", title_id);
   }
-  sceKernelSleep(10);
 
   nthread_run = 0;
 
   if (config.shutdown) {
+    sceKernelSleep(10);
     reboot();
   }
 
