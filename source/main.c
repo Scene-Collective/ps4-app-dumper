@@ -194,6 +194,7 @@ int _main(struct thread *td) {
   initPthread();
 
   jailbreak();
+  mmap_patch();
 
   initSysUtil();
 
