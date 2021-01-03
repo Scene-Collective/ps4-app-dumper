@@ -21,32 +21,37 @@ typedef struct {
   int shutdown;
 } configuration;
 
-struct npbind_header {
+typedef struct {
   uint32_t magic;
   uint32_t version;
   uint64_t file_size;
   uint64_t entry_size;
   uint64_t num_entries;
-  unsigned char padding[96];
-};
+  char padding[96];
+} npbind_header;
 
-struct npbind_entry {
+typedef struct {
   uint16_t type;
   uint16_t size;
-  unsigned char data[];
-};
+  char data[];
+} npbind_entry;
 
-struct npbind_body {
-  struct npbind_entry npcommid_name;
-  struct npbind_entry tophy_number;
-  struct npbind_entry unk1;
-  struct npbind_entry unk2;
-  unsigned char padding[152];
-};
+typedef struct {
+  npbind_entry npcommid_name;
+  npbind_entry tophy_number;
+  npbind_entry unk1;
+  npbind_entry unk2;
+  char padding[152];
+} npbind_body;
 
-struct npbind_file {
-  struct npbind_header header;
-  struct npbind_body body[];
-};
+typedef struct {
+  npbind_header header;
+  npbind_body body[];
+} npbind_content;
+
+typedef struct {
+  npbind_content *content;
+  char digest[0x14];
+} npbind_file;
 
 #endif
