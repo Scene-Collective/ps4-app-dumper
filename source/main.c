@@ -41,7 +41,6 @@ static int config_handler(void *user, const char *name, const char *value) {
 }
 
 int npbind_parse(const char *filename) {
-  // TODO: Figure out how to do the stuct without having to use padding beyond the 152 that it should be
   npbind_header header;
   memset(&header, 0, sizeof(npbind_header));
 
@@ -63,54 +62,81 @@ int npbind_parse(const char *filename) {
 
   uint64_t entry_size = bswap64(header.entry_size);
   uint64_t file_size = bswap64(header.file_size);
+  uint64_t num_entries = bswap64(header.num_entries);
 
-  npbind_content *content = malloc(file_size - 0x14);
-  if (content == NULL) {
-    close(fd);
-    return 4;
-  }
-  content->header = header;
-
-  uint64_t num_bodies = (file_size - sizeof(npbind_header) - 0x14) / entry_size;
+  npbind_content content;
+  memset(&content, 0, sizeof(npbind_content));
+  content.header = header;
 
   lseek(fd, sizeof(npbind_header), SEEK_SET);
-  for (uint64_t i = 0; i < num_bodies; i++) {
-    if ((int64_t)entry_size != read(fd, &content->body[i], entry_size)) {
-      close(fd);
-      free(content);
-      return 5;
+  for (uint64_t i = 0; i < num_entries; i++) {
+    npbind_body body;
+    uint64_t total = 0;
+    while(total < entry_size) {
+      uint16_t type;
+      uint16_t size;
+      if (sizeof(uint16_t) != read(fd, &type, sizeof(uint16_t)) || sizeof(uint16_t) != read(fd, &size, sizeof(uint16_t))) {
+        close(fd);
+        return 4;
+      }
+      char data[bswap16(size)];
+      if (bswap16(size) != read(fd, &data, bswap16(size))) {
+        close(fd);
+        return 5;
+      }
+      if (bswap16(type) == 0x0010) {
+        npbind_npcommid_entry entry;
+        entry.type = type;
+        entry.size = size;
+        memcpy(entry.data, data, sizeof(entry.data));
+        body.npcommid = entry;
+      } else if (bswap16(type) == 0x0011) {
+        npbind_trophy_number_entry entry;
+        entry.type = type;
+        entry.size = size;
+        memcpy(entry.data, data, sizeof(entry.data));
+        body.trophy_number = entry;
+      } else if (bswap16(type) == 0x0012) {
+        npbind_unk1_entry entry;
+        entry.type = type;
+        entry.size = size;
+        memcpy(entry.data, data, sizeof(entry.data));
+        body.unk1 = entry;
+      } else if (bswap16(type) == 0x0013) {
+        npbind_unk2_entry entry;
+        entry.type = type;
+        entry.size = size;
+        memcpy(entry.data, data, sizeof(entry.data));
+        body.unk2 = entry;
+      }
+      total += (sizeof(uint16_t) * 2) + bswap16(size);
     }
+    memset(&body.padding, 0, sizeof(body.padding));
+    // TODO: Append body to content.body[i]
   }
 
   char digest[0x14] = {0};
   lseek(fd, -(sizeof(digest)), SEEK_END);
   if (sizeof(digest) != read(fd, &digest, sizeof(digest))) {
     close(fd);
-    free(content);
     return 6;
   }
 
   close(fd);
 
-  // TODO: Check digest vs npbind_content, error 7
+  // TODO: Check digest vs npbind_content, else return error 7
 
   // Preform endian swaps so we don't have to think about it later
-  content->header.magic = bswap32(content->header.magic);
-  content->header.version = bswap32(content->header.version);
-  content->header.file_size = bswap64(content->header.file_size);
-  content->header.entry_size = bswap64(content->header.entry_size);
-  content->header.num_entries = bswap64(content->header.num_entries);
-  // TODO : Swap trophy number so we can use atoi() on it vs [0] and %c
+  content.header.magic = bswap32(content.header.magic);
+  content.header.version = bswap32(content.header.version);
+  content.header.file_size = bswap64(content.header.file_size);
+  content.header.entry_size = bswap64(content.header.entry_size);
+  content.header.num_entries = bswap64(content.header.num_entries);
+  // TODO : Swap trophy number so we can use atoi() on it
 
-  // Combine Conent and Digest into File
   npbind_file file;
   file.content = content;
-  memmove_s(file.digest, sizeof(digest), digest, sizeof(digest));
-  printf_notification("Magic: 0x%08X\nVersion: %u\nFileize: %lu bytes\nEntry Size: %lu bytes\nNum of Entries: %lu", file.content->header.magic, file.content->header.version, file.content->header.file_size, file.content->header.entry_size, file.content->header.num_entries);
-  for (uint64_t i = 0; i < num_bodies; i++) {
-    printf_notification("trophy0%c.trp: /user/trophy/conf/%s/TROPHY.TRP", content->body[i].tophy_number.data[0], content->body[i].npcommid_name.data);
-  }
-  //free(content);
+  memmove(file.digest, digest, sizeof(digest));
 
   return 0;
 }
