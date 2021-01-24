@@ -1,3 +1,7 @@
+#define DEBUG_SOCKET
+#define DEBUG_IP "192.168.8.24"
+#define DEBUG_PORT 9023
+
 #include "ps4.h"
 
 #include "main.h"
@@ -14,7 +18,7 @@ void *nthread_func(void *arg) {
       time_t t2 = time(NULL);
       if ((t2 - t1) >= config.notify) {
         t1 = t2;
-        systemMessage(notify_buf);
+        printf_notification("%s", notify_buf);
       }
     } else {
       t1 = 0;
@@ -72,7 +76,7 @@ int npbind_parse(const char *filename) {
   for (uint64_t i = 0; i < num_entries; i++) {
     npbind_body body;
     uint64_t total = 0;
-    while(total < entry_size) {
+    while (total < entry_size) {
       uint16_t type;
       uint16_t size;
       if (sizeof(uint16_t) != read(fd, &type, sizeof(uint16_t)) || sizeof(uint16_t) != read(fd, &size, sizeof(uint16_t))) {
@@ -251,6 +255,11 @@ int _main(struct thread *td) {
   initLibc();
   initPthread();
 
+#ifdef DEBUG_SOCKET
+  initNetwork();
+  DEBUG_SOCK = SckConnect(DEBUG_IP, DEBUG_PORT);
+#endif
+
   jailbreak();
   mmap_patch();
 
@@ -306,6 +315,11 @@ int _main(struct thread *td) {
   } else {
     printf_notification("%s dumped.\nQuitting...", title_id);
   }
+
+#ifdef DEBUG_SOCKET
+  printf_socket("\nClosing socket...\n\n");
+  SckClose(DEBUG_SOCK);
+#endif
 
   if (config.shutdown) {
     sceKernelSleep(10);

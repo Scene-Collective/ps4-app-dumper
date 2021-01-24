@@ -51,7 +51,7 @@ typedef struct {
 typedef struct {
   uint16_t type;
   uint16_t size;
-  char data [0x10];
+  char data[0x10];
 } npbind_unk2_entry;
 
 typedef struct {
