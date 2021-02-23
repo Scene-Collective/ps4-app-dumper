@@ -275,13 +275,9 @@ int _main(struct thread *td) {
 
   printf_notification("Running App Dumper");
 
-  if (!wait_for_usb(usb_name, usb_path)) {
-    snprintf_s(notify_buf, sizeof(notify_buf), "Waiting for USB device...");
-    do {
-      sceKernelSleep(1);
-    } while (!wait_for_usb(usb_name, usb_path));
-    notify_buf[0] = '\0';
-  }
+  snprintf_s(notify_buf, sizeof(notify_buf), "Waiting for USB device...");
+  wait_for_usb(usb_name, usb_path);
+  notify_buf[0] = '\0';
 
   snprintf_s(cfg_path, sizeof(cfg_path), "%s/dumper.cfg", usb_path);
   cfg_parse(cfg_path, config_handler, &config);
